@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Mi IA</title>
+    <style>
+        body {
+            background-color: #1e1e1e;
+            color: white;
+            font-family: Arial;
+        }
+        #chat {
+            height: 400px;
+            overflow-y: auto;
+            border: 1px solid gray;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        input {
+            width: 80%;
+            padding: 10px;
+        }
+        button {
+            padding: 10px;
+        }
+        .user {
+            color: lightblue;
+        }
+        .bot {
+            color: lightgreen;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Mi IA 🔥</h2>
+
+<div id="chat"></div>
+
+<input type="text" id="mensaje" placeholder="Escribe algo...">
+<button onclick="enviar()">Enviar</button>
+
+<script>
+async function enviar() {
+    const input = document.getElementById("mensaje");
+    const texto = input.value;
+
+    document.getElementById("chat").innerHTML += 
+        "<p class='user'><b>Tú:</b> " + texto + "</p>";
+
+    const res = await fetch("http://127.0.0.1:8000/chat", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ texto: texto })
+    });
+
+    const data = await res.json();
+
+    document.getElementById("chat").innerHTML += 
+        "<p class='bot'><b>IA:</b> " + data.respuesta + "</p>";
+
+    input.value = "";
+}
+</script>
+
+</body>
+</html>
