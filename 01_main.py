@@ -12,7 +12,7 @@ agent = Agent()
 while True:
     user_input = input("Tú: ").strip()
     
-    #Validaciones
+    # Validaciones
     if not user_input:
         continue
     
@@ -20,20 +20,21 @@ while True:
         print("Hasta luego!")
         break
     
-    #Agregar nuestro mensaje al historial
+    # Agregar mensaje del usuario
     agent.messages.append({"role": "user", "content": user_input})
     
-    while True:
-        response = client.responses.create(
-            model="gpt-5-nano",
-            input=agent.messages,
-            tools=agent.tools
-        )
-        
-        called_tool = agent.process_response(response)
-        
-        #Si no se llamo herramienta, tenemos la respuesta final
-        if not called_tool:
-            break
-        
-        
+    # 🔥 OPTIMIZACIÓN: Limitar historial
+    agent.messages = agent.messages[-6:]
+    
+    print("Byte:", end=" ", flush=True)
+
+    with client.responses.stream(
+        model="gpt-5-nano",
+        input=agent.messages,
+    ) as stream:
+
+        for event in stream:
+            if event.type == "response.output_text.delta":
+                print(event.delta, end="", flush=True)
+
+    print()  # salto de línea
